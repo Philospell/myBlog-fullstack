@@ -5,6 +5,8 @@ const userRoutes = require('./routes/users');
 const app = express();
 const port = 3000;
 
+app.use(express.json())
+
 app.get('/', (req, res) => {
     res.send('서버가 잘 돌아갑니당.');
 });
