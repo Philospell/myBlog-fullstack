@@ -2,6 +2,29 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const bcrypt = require('bcrypt');
+const isLoggedIn = require('./middlewares/isLoggedIn');
+
+/**
+ * GET
+ */
+
+router.get('/logout', isLoggedIn, (req, res) => {
+    res.clearCookie('connect.sid');
+    req.session.destroy(() => {
+        res.json({ message: '로그아웃 완료' });
+    })
+})
+
+router.get('/profile', isLoggedIn, (req, res) => {
+    res.json({
+        message: '접근 성공', user: req?.session?.user
+    });
+})
+
+
+/**
+ * POST
+ */
 
 router.post('/login', (req, res) => {
     const { email, password } = req.body;
@@ -28,7 +51,13 @@ router.post('/login', (req, res) => {
             return res.status(401).json({ error: '비밀번호가 일치하지 않습니다.' });
         }
 
-        // TODO: 로그인 상태 저장 (세션 or JWT)
+        // 로그인 상태 저장 (세션 or JWT)
+        req.session.user = {
+            id: user.id,
+            email: user.email,
+            nickname: user.nickname
+        }
+
         res.status(200).json({ message: '로그인 성공', userId: user.id, nickname: user.nickname });
     })
 });
