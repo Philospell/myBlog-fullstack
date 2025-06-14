@@ -3,6 +3,7 @@ require('dotenv').config();
 const session = require('express-session');
 const userRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
+const postsRoutes = require('./routes/posts');
 
 const app = express();
 const port = 3000;
@@ -33,3 +34,4 @@ app.listen(port, () => {
 
 app.use('/users', userRoutes);
 app.use('/auth', authRoutes);
+app.use('/posts', postsRoutes);
