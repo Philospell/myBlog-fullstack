@@ -8,13 +8,6 @@ const isLoggedIn = require('../middlewares/isLoggedIn');
  * GET
  */
 
-router.get('/logout', isLoggedIn, (req, res) => {
-    res.clearCookie('connect.sid');
-    req.session.destroy(() => {
-        res.json({ message: '로그아웃 완료' });
-    })
-})
-
 router.get('/profile', isLoggedIn, (req, res) => {
     res.json({
         message: '접근 성공', user: req?.session?.user
@@ -61,5 +54,12 @@ router.post('/login', (req, res) => {
         res.status(200).json({ message: '로그인 성공', userId: user.id, nickname: user.nickname });
     })
 });
+
+router.post('/logout', isLoggedIn, (req, res) => {
+    res.clearCookie('connect.sid');
+    req.session.destroy(() => {
+        res.json({ message: '로그아웃 완료' });
+    })
+})
 
 module.exports = router;
