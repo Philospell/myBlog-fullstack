@@ -5,4 +5,4 @@ function isLoggedIn(req, res, next) {
     return res.status(401).json({ error: '로그인이 필요합니다.' });
 }
 
-module.exports = isLoggedIn;
+module.exports = { isLoggedIn };
