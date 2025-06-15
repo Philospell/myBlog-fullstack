@@ -25,6 +25,24 @@ router.get('/', async (req, res) => {
     }
 })
 
+router.get('/:id', async (req, res) => {
+    const postId = req?.params?.id;
+
+    try {
+        const sql = 'SELECT * FROM posts WHERE id = ?';
+        const [rows] = await db.promise().query(sql, [postId]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' });
+        }
+
+        return res.status(200).json(rows[0]);
+    } catch (error) {
+        console.error('게시글 조회 실패', error);
+        return res.status(500).json({ message: '서버 오류로 게시글을 불러오지 못했습니다.' });
+    }
+})
+
 /**
  * POST
  */
