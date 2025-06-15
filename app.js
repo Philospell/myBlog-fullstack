@@ -35,3 +35,15 @@ app.listen(port, () => {
 app.use('/users', userRoutes);
 app.use('/auth', authRoutes);
 app.use('/posts', postsRoutes);
+
+/**
+ * 전역 404, 오류 처리 함수 추가
+ */
+app.use((req, res, next) => {
+    res.status(404).json({ message: '요청하신 페이지를 찾을 수 없습니다.' })
+})
+
+app.use((err, req, res, next) => {
+    console.error('[서버 오류]', err);
+    res.status(500).json({ message: '서버 내부 오류가 발생했습니다.' })
+})
