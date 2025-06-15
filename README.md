@@ -15,29 +15,52 @@ RESTful 설계 기반의 실제 동작하는 블로그를 만들어보며
 ### 📌 진행 내용
 
 - `GET /posts` 게시글 전체 조회 구현
-  - DB 연결 및 게시글 목록을 배열로 반환
-  - `.promise().query()`로 async/await 패턴 적용
 - `GET /posts/:id` 게시글 상세 조회 구현
-  - `:id` URL 파라미터로 개별 게시글 조회
-  - 존재하지 않는 게시글에 대한 404 처리
-- RESTful 설계 철학에 따라 조회 API는 로그인 없이 접근 가능하도록 구성
+- RESTful 설계 철학에 따라 조회 API는 로그인 없이 접근 가능
 - `[rows] = await db.promise().query(...)` 구조 분해 방식 학습
 - `db.query()` vs `db.execute()` 차이 학습
-- `mysql2/promise`를 사용하여 비동기 방식으로 처리
+- `mysql2/promise`를 사용하여 async/await 적용
 - 전역 에러 및 404 처리 라우터 추가
 - `next(err)`로 에러를 전파하는 방식 학습
-- `app.listen(...)`은 서버를 실제 실행시키는 핵심 함수임을 이해
-- `app.use(...)`는 요청을 처리할 규칙을 등록하는 함수임을 학습
+- `app.listen(...)` → 서버를 실제로 실행
+- `app.use(...)` → 요청 처리 방식 등록
 
 ### ❓ 핵심 질문 요약
 
-- `:id`는 약속된 문법인가?
-- `db.query()` vs `db.execute()` 차이?
-- `mysql2/promise` 왜 쓰는가?
-- `[rows]`만 구조분해 할당해도 되나?
-- 게시글 조회 시 로그인 필요 여부?
-- 예상치 못한 에러는 어디서 처리?
-- `app.listen()`과 `app.use()`의 관계?
+<details>
+<summary>:id는 약속된 문법인가?</summary>
+Express에서 `:id`는 `req.params.id`로 자동 매핑되는 URL 파라미터 문법입니다.
+</details>
+
+<details>
+<summary>db.query() vs db.execute() 차이?</summary>
+`query()`는 일반 쿼리 실행, `execute()`는 prepared statement로 SQL 인젝션 방지에 유리합니다.
+</details>
+
+<details>
+<summary>mysql2/promise는 왜 쓰는가?</summary>
+콜백 기반 대신 async/await 문법을 사용할 수 있도록 도와줍니다.
+</details>
+
+<details>
+<summary>[rows]만 구조분해 해도 되는 이유?</summary>
+`query()`는 `[rows, fields]`를 반환하며, 보통 `rows`만 필요합니다.
+</details>
+
+<details>
+<summary>게시글 조회는 로그인 필요 없나?</summary>
+공개 API이므로 로그인 없이도 접근 가능합니다.
+</details>
+
+<details>
+<summary>예상치 못한 에러는 어디서 처리?</summary>
+`catch → next(err)`로 전역 에러 미들웨어에서 처리합니다.
+</details>
+
+<details>
+<summary>app.listen()과 app.use()의 역할은?</summary>
+`listen()`은 서버 실행, `use()`는 라우팅 또는 미들웨어 등록 역할입니다.
+</details>
 
 ---
 
@@ -45,20 +68,32 @@ RESTful 설계 기반의 실제 동작하는 블로그를 만들어보며
 
 ### 📌 진행 내용
 
-- 로그인된 유저의 세션을 통해 게시글 작성 구현
-- `POST /posts` 구현 (`title`, `content`, `user_id`)
-- 세션으로부터 `user_id` 추출해 게시글에 연결
-- 게시글 작성 시 미들웨어 `isLoggedIn` 적용
-- SQL 테이블 `posts` 존재 확인 및 활용
-- 게시글 작성 성공/실패 메시지 구성
+- `POST /posts` 글 작성 구현
+- 로그인된 유저의 세션 정보로 `user_id` 연결
+- `isLoggedIn` 미들웨어로 작성 제한
+- 게시글 테이블 존재 여부 확인 및 적용
 
 ### ❓ 핵심 질문 요약
 
-- `req.body`에서 구조 분해 실패 이유?
-- `req.body`가 undefined인 원인과 해결 방법은?
-- `express.json()`의 역할?
-- 브라우저 ↔ 서버 ↔ DB 간 데이터 흐름은?
-- 게시글 작성 시 로그인된 유저 정보는 어디서 가져오나?
+<details>
+<summary>req.body 구조 분해 실패 원인?</summary>
+`express.json()` 미사용 시 body가 파싱되지 않아 undefined입니다.
+</details>
+
+<details>
+<summary>express.json() 왜 필요한가?</summary>
+`application/json` 형식의 요청 본문을 파싱해 `req.body`에 넣어줍니다.
+</details>
+
+<details>
+<summary>브라우저 → 서버 → DB 흐름?</summary>
+브라우저 → POST → 서버 → DB → 결과 응답 → 브라우저로 되돌아오는 흐름입니다.
+</details>
+
+<details>
+<summary>글 작성 시 유저 정보는 어디서 오나?</summary>
+세션에 저장된 로그인된 유저 정보를 사용합니다.
+</details>
 
 ---
 
@@ -66,22 +101,39 @@ RESTful 설계 기반의 실제 동작하는 블로그를 만들어보며
 
 ### 📌 진행 내용
 
-- 로그인 구현 완료 (`POST /login`)
-- 로그인 성공 시 세션에 사용자 정보 저장
-- `req.session.user` 구조 이해
+- 로그인 구현 (`POST /login`)
+- 로그인 성공 시 세션에 user 저장
 - 로그아웃 구현 (`POST /logout`)
-- 로그인 여부 확인 미들웨어 `isLoggedIn` 도입
-- 세션 기반 인증 흐름 정리
-- 쿠키, 세션, JWT 보안 이해
+- 로그인 여부 미들웨어 `isLoggedIn` 구현
+- 세션/쿠키 기반 인증 흐름 파악
+- JWT/세션 보안 개념 정리
 
 ### ❓ 핵심 질문 요약
 
-- 세션과 JWT 개념 차이?
-- 세션 ID가 탈취되면 어떤 일이 벌어지나?
-- 인증과 보안은 같은 개념인가?
-- 세션 ID는 클라이언트 어디에 저장됨?
-- 로그아웃 후에도 쿠키에 세션 ID가 남는 이유?
-- `set-cookie`는 어디서 자동으로 처리되나?
+<details>
+<summary>세션 ID 탈취 위험은?</summary>
+HTTP/비암호화 환경에선 탈취 가능성이 있으며, 이를 방지하려면 HTTPS가 필수입니다.
+</details>
+
+<details>
+<summary>인증 = 보안인가?</summary>
+아닙니다. 인증은 사용자를 식별하는 절차일 뿐, 보안은 그 이후의 책임입니다.
+</details>
+
+<details>
+<summary>세션 ID는 클라이언트 어디 저장?</summary>
+브라우저 쿠키에 저장되어 서버로 전송됩니다.
+</details>
+
+<details>
+<summary>로그아웃 후에도 쿠키가 남는 이유?</summary>
+브라우저는 명시적으로 삭제하지 않는 한 쿠키를 유지합니다.
+</details>
+
+<details>
+<summary>set-cookie는 언제 생기나?</summary>
+로그인 성공 후 `req.session.user`에 값을 넣을 때 자동으로 생성됩니다.
+</details>
 
 ---
 
@@ -89,18 +141,36 @@ RESTful 설계 기반의 실제 동작하는 블로그를 만들어보며
 
 ### 📌 진행 내용
 
-- 회원가입 구현 완료 (`POST /users`)
-- `bcrypt`로 비밀번호 해싱 적용
-- Express 미들웨어 구조 학습
-- `req.body` 사용을 위한 `express.json()` 적용
-- 사용자 정보 등록 API 테스트 완료
+- `POST /users` 회원가입 구현
+- `bcrypt`로 비밀번호 암호화
+- `express.json()` 적용
+- 회원가입 성공 시 201 응답
 
 ### ❓ 핵심 질문 요약
 
-- `bcrypt.hash(password, 10)`의 두 번째 인자 의미는?
-- `req.body`를 파싱하지 않으면 어떤 문제가 생기나?
-- 비밀번호 해시 후 원본 기억 안 나면 어떻게 되나?
-- `res.status(201)`과 같은 HTTP 상태코드 언제 쓰는가?
+<details>
+<summary>bcrypt.hash(..., 10)의 숫자 의미?</summary>
+해시 알고리즘의 반복 횟수 (cost factor)로 보안 난이도입니다.
+</details>
+
+<details>
+<summary>req.body 없으면 어떤 문제?</summary>
+요청 본문을 파싱하지 못해 서버가 값을 읽지 못합니다.
+</details>
+
+<details>
+<summary>비밀번호 해시된 거 기억 안나면?</summary>
+직접 로그인은 불가능하지만 DB에서 덮어쓰면 됩니다.
+</details>
+
+<details>
+<summary>HTTP 상태코드 언제 어떤 걸 쓰나?</summary>
+- 200: 성공  
+- 201: 리소스 생성  
+- 400: 잘못된 요청  
+- 401: 인증 필요  
+- 500: 서버 에러
+</details>
 
 ---
 
@@ -108,17 +178,27 @@ RESTful 설계 기반의 실제 동작하는 블로그를 만들어보며
 
 ### 📌 진행 내용
 
-- Express 서버 기본 설정 완료
-- `app.js` 파일 구성 및 모듈 분리
-- DB 연결 모듈 분리 및 재사용 구조 구축
-- `server/routes/users.js`에서 분리된 라우터 작성
-- 서버 구동 및 기본 응답 테스트 완료
+- `app.js` Express 서버 설정 완료
+- `server/routes/users.js` 모듈화
+- DB 연결 모듈화 및 재사용 가능하게 설정
+- 서버 실행 테스트
 
 ### ❓ 핵심 질문 요약
 
-- 파일마다 DB를 새로 연결해야 하나?
-- 라우터를 모듈로 나누는 기준은?
-- 전역에서 `use`로 등록한 라우터와 경로는 어떻게 연결되나?
+<details>
+<summary>파일마다 DB 연결을 해야 하나?</summary>
+재사용 가능한 DB 모듈로 분리하면 여러 라우트에서 공유 가능합니다.
+</details>
+
+<details>
+<summary>라우터 구조는 어떻게 나누는가?</summary>
+기능 단위(users, posts 등)로 routes 폴더에 나눕니다.
+</details>
+
+<details>
+<summary>전역 use로 라우터 등록 시 경로 구성은?</summary>
+`app.use('/users', usersRouter)`는 `/users/...` 경로에서 동작합니다.
+</details>
 
 ---
 
@@ -126,18 +206,32 @@ RESTful 설계 기반의 실제 동작하는 블로그를 만들어보며
 
 ### 📌 진행 내용
 
-- MySQL 테이블 생성
-  - `users`, `posts` 테이블 작성
-  - `created_at`, `updated_at` 자동 타임스탬프 설정
-  - `FOREIGN KEY`로 테이블 간 관계 설정
-- `UPDATE` 문으로 데이터 수정 연습
+- `users`, `posts` 테이블 생성
+- `created_at`, `updated_at` 자동 설정
+- `FOREIGN KEY` 설정
+- 이메일 수정 테스트
 
 ### ❓ 핵심 질문 요약
 
-- `PRIMARY KEY`가 `FOREIGN KEY`일 수 있는가?
-- `CURRENT_TIMESTAMP`는 어떤 기능을 하나?
-- 외래키 관계 설정은 어떤 순서로 하나?
-- 이미 삽입한 이메일을 수정하고 싶을 때 SQL 문은?
+<details>
+<summary>PRIMARY KEY = FOREIGN KEY 가능?</summary>
+일반적으로는 별개이며, 1:1 관계일 때 예외적으로 가능하긴 합니다.
+</details>
+
+<details>
+<summary>CURRENT_TIMESTAMP 기능은?</summary>
+데이터 생성 또는 갱신 시 자동으로 시간 값을 입력해줍니다.
+</details>
+
+<details>
+<summary>외래키 설정 순서는?</summary>
+참조 대상 테이블이 먼저 존재해야 외래키 제약조건 설정이 가능합니다.
+</details>
+
+<details>
+<summary>이메일 수정 SQL은?</summary>
+`UPDATE users SET email='new@email.com' WHERE id=1;`
+</details>
 
 ---
 
@@ -145,13 +239,24 @@ RESTful 설계 기반의 실제 동작하는 블로그를 만들어보며
 
 ### 📌 진행 내용
 
-- 프로젝트 전체 구성 계획 수립
-- MySQL 로컬 설치 및 `myblog` DB 생성
-- `utf8mb4` 설정 이유 학습
-- 앞으로의 진도 계획 수립 (1장 ~ 7장 구조)
+- 전체 프로젝트 설계 구성
+- `myblog` 데이터베이스 생성
+- `utf8mb4` 인코딩 설정
+- 전체 학습 흐름 목차 설정
 
 ### ❓ 핵심 질문 요약
 
-- `CREATE DATABASE myblog CHARACTER SET utf8mb4`의 의미는?
-- utf8mb4와 일반 utf8의 차이는?
-- 실제 운영 환경에서는 DB를 어떻게 배포하는가?
+<details>
+<summary>utf8mb4 vs utf8 차이?</summary>
+`utf8mb4`는 이모지 포함 모든 유니코드 문자 지원. `utf8`은 3바이트까지만 지원.
+</details>
+
+<details>
+<summary>CREATE DATABASE 구문 해석?</summary>
+`CHARACTER SET`, `COLLATE` 설정으로 DB 인코딩 방식을 지정합니다.
+</details>
+
+<details>
+<summary>로컬 DB로 시작해도 되는가?</summary>
+초기 학습 및 테스트에는 로컬이 좋고, 나중에 클라우드로 이전 가능합니다.
+</details>
