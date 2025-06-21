@@ -10,7 +10,7 @@ const { isLoggedIn } = require('../middlewares/isLoggedIn');
 router.get('/', async (req, res) => {
     try {
         const query = `
-        SELECT posts.id, posts.title, posts.created_at, users.nickname
+        SELECT posts.id, posts.title, posts.content, posts.created_at, users.nickname
         FROM posts
         JOIN users ON posts.user_id = users.id
         ORDER BY posts.created_at DESC
