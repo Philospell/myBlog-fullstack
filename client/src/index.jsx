@@ -1,9 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import PostList from './components/PostLIst';
 
-const App = () => {
-    return <h1>My Blog Frontend 시작!</h1>
-}
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
+const container = document.getElementById('root');
+const root = ReactDOM.createRoot(container);
+root.render(<PostList />);
