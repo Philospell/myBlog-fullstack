@@ -10,6 +10,48 @@ RESTful 설계 기반의 실제 동작하는 블로그를 만들어보며
 
 ---
 
+## ✅ 11일차 (2025.06.21 · 토요일)
+
+### 📌 진행 내용
+
+- 클라이언트에서 실제 API 호출 (`GET /posts`)하여 게시글 목록 표시
+- 클라이언트 코드에서 `import/export` 사용 시 type: commonjs 세팅 오류 해결
+- Webpack dev server와 Node 서버가 각각 3001, 3000 포트에서 정상 구동 확인
+- CORS 정책과 브라우저-서버 간 보안 흐름에 대한 개념 완전 정리
+- 서버에서 `cors` 미들웨어 적용 (`Access-Control-Allow-Origin`) - 3001번 포트 오픈
+- 개발 환경에서 서로 다른 포트를 사용하는 클라이언트-서버 구성 실습
+- CORS 관련 흐름도와 네트워크 레벨 동작 방식에 대한 이해 완료
+
+### ❓ 핵심 질문 요약
+
+<details>
+<summary>🟠 CORS는 서버 보안 설정인가요, 브라우저 보안 장치인가요?</summary>
+<b>답변:</b> CORS는 <b>브라우저 보안 정책</b>으로, 서버는 그에 맞춰 응답 헤더를 내려줄 뿐입니다.
+</details>
+
+<details>
+<summary>🟠 서버에서 CORS를 허용하면 뭐가 문제인가요?</summary>
+<b>답변:</b> 악성 사이트가 사용자 브라우저를 통해 무단 요청을 시도할 수 있습니다. 이를 막기 위해 서버는 <code>Access-Control-Allow-Origin</code>을 제한적으로 설정해야 합니다.
+</details>
+
+<details>
+<summary>🟠 브라우저가 CORS 응답을 검사하는 타이밍은 언제인가요?</summary>
+<b>답변:</b> 요청을 보낸 후 응답 헤더에서 <code>Access-Control-Allow-Origin</code>을 확인해, 허용되지 않으면 JS 실행을 차단합니다.
+</details>
+
+<details>
+<summary>🟠 오픈 API 서버는 CORS 어떻게 설정하나요?</summary>
+<b>답변:</b> 오픈 API 서버는 일반적으로 CORS를 모두 허용하되, 인증을 위해 API Key나 OAuth 등을 요구합니다.
+</details>
+
+<details>
+<summary>🟠 OAuth도 탈취 위험이 있나요?</summary>
+<b>답변:</b> 네. OAuth 토큰이 탈취되면 타인의 권한으로 접근할 수 있습니다. HTTPS 등으로 보호 필요.
+</details>
+
+---
+
+
 ## ✅ 10일차 (2025.06.19 · 목요일)
 
 ### 📌 진행 내용
