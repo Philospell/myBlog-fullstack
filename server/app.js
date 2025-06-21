@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors')
 require('dotenv').config();
 const session = require('express-session');
 const userRoutes = require('./routes/users');
@@ -9,6 +10,12 @@ const app = express();
 const port = 3000;
 
 app.use(express.json())
+
+// CORS 처리
+app.use(cors({
+    origin: 'http://localhost:3001',
+    credentials: true
+}))
 
 // 아래 내용에 의해 express-session이 session에 변화가 있으면 미들웨어로 set-cookie 등 세션 관리를 알아서 처리 해준다.
 app.use(
