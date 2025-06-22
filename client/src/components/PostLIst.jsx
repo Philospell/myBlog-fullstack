@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getPosts } from '../api/posts';
 
 const PostList = () => {
@@ -16,7 +17,7 @@ const PostList = () => {
             <ul>
                 {posts.map((post) => (
                     <li key={post.id}>
-                        <strong>{post.title}</strong> - {post.content}
+                        <Link to={`/posts/${post.id}`}><strong>{post.title}</strong></Link> - {post.content}
                     </li>
                 ))}
             </ul>
