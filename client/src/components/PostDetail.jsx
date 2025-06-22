@@ -16,7 +16,7 @@ export default function PostDetail() {
         <div>
             <h2>{post.title}</h2>
             <p>{post.content}</p>
-            <small>작성자: {post.nickname}</small>
+            <small>작성자: {post.author}</small>
         </div>
     )
 }
