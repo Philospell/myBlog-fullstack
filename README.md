@@ -10,6 +10,56 @@ RESTful 설계 기반의 실제 동작하는 블로그를 만들어보며
 
 ---
 
+## ✅ 12일차 (2025.06.22 · 일요일)
+
+### 📌 진행 내용
+
+- 클라이언트 라우팅 구성 (react-router-dom)
+    - BrowserRouter, <Routes>, <Route> 기본 구성
+    - /posts/:id 경로에 따라 PostDetail 컴포넌트로 이동
+- 클라이언트에서 /posts/:id API 호출 구현 및 화면 출력
+- 서버 /posts/:id 라우트 수정
+    - users.nickname을 author로 함께 반환하도록 JOIN 쿼리 작성
+- 클라이언트에서 author, title, content를 PostDetail 페이지에서 확인 가능하게 구현
+- 새로고침 시 에러 해결: Webpack의 publicPath: '/' 설정으로 SPA 경로 보완
+- SQL의 JOIN, INNER JOIN, LEFT JOIN, RIGHT JOIN 개념 및 동작 방식 학습
+- 삭제된 사용자와의 관계에서 INNER JOIN과 LEFT JOIN의 차이 이해
+
+### ❓ 핵심 질문 요약
+
+<details>
+<summary>🟠 새로고침 시 bundle.js 오류가 났던 이유는 무엇인가요?</summary>
+<b>답변:</b> Webpack 설정에서 <code>publicPath: '/'</code>를 명시하지 않으면, 동적 라우팅 주소(`/posts/3`)가 HTML이 아닌 JS로 인식되지 않아 발생합니다.
+</details>
+
+<details>
+<summary>🟠 `export default const PostDetail`은 왜 에러가 나나요?</summary>
+<b>답변:</b> JavaScript 문법상 <code>export default</code>는 선언이 아닌 <code>값</code>에 써야 하므로, <code>const PostDetail = () => {}</code> 다음 <code>export default PostDetail</code>처럼 분리해야 합니다.
+</details>
+
+<details>
+<summary>🟠 React 17 이후에는 `import React from 'react'`를 생략해도 되지 않나요?</summary>
+<b>답변:</b> 맞지만, Babel 설정에 따라 여전히 필요한 경우도 있음. 문제가 생긴다면 명시적으로 넣는 것이 안전합니다.
+</details>
+
+
+<details>
+<summary>🟠 `/posts/:id` 요청에서 작성자의 nickname을 어떻게 함께 가져오나요?</summary>
+<b>답변:</b> `posts.user_id`와 `users.id`를 기준으로 <code>INNER JOIN</code> 하여 <code>users.nickname</code>을 <code>author</code>로 받아옵니다.
+</details>
+
+<details>
+<summary>🟠 INNER JOIN과 LEFT JOIN의 차이는 무엇인가요?</summary>
+<b>답변:</b> <code>INNER JOIN</code>은 양쪽 테이블 모두에 데이터가 있어야 결과에 포함되며, <code>LEFT JOIN</code>은 왼쪽 테이블 기준으로 오른쪽이 없으면 <code>NULL</code>로 채웁니다.
+</details>
+
+<details>
+<summary>🟠 삭제된 유저의 글이 남아있다면 INNER JOIN으로는 어떻게 되나요?</summary>
+<b>답변:</b> <code>INNER JOIN</code>에서는 해당 글이 조회되지 않습니다. 유저 정보가 없기 때문입니다.
+</details>
+
+---
+
 ## ✅ 11일차 (2025.06.21 · 토요일)
 
 ### 📌 진행 내용
