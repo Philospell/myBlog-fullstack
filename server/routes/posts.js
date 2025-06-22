@@ -29,7 +29,7 @@ router.get('/:id', async (req, res) => {
     const postId = req?.params?.id;
 
     try {
-        const sql = 'SELECT * FROM posts WHERE id = ?';
+        const sql = 'SELECT posts.*, users.nickname AS author FROM posts JOIN users ON posts.user_id = users.id WHERE posts.id = ?';
         const [rows] = await db.promise().query(sql, [postId]);
 
         if (rows.length === 0) {
