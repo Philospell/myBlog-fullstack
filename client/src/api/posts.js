@@ -1,19 +1,17 @@
-import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:3000';
+import { authenticatedAxios } from './axiosInstance';
 
 export const getPosts = async () => {
-    const response = await axios.get(`${API_BASE_URL}/posts`, { withCredentials: true });
+    const response = await authenticatedAxios.get(`/posts`, { withCredentials: true });
     return response.data;
 }
 
 export const getPost = async (id) => {
-    const response = await axios.get(`${API_BASE_URL}/posts/${id}`, { withCredentials: true });
+    const response = await authenticatedAxios.get(`/posts/${id}`, { withCredentials: true });
     return response.data;
 }
 
 export const setPost = async ({ title, content }) => {
-    const response = await axios.post(`${API_BASE_URL}/posts`, {
+    const response = await authenticatedAxios.post(`/posts`, {
         title,
         content,
     }, {
