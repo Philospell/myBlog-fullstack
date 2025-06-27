@@ -64,9 +64,13 @@ router.post('/login', (req, res) => {
 });
 
 router.post('/logout', isLoggedIn, (req, res) => {
-    res.clearCookie('connect.sid');
-    req.session.destroy(() => {
-        res.json({ message: '로그아웃 완료' });
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('세션 제거 중 오류:', err);
+            return res.status(500).json({ message: '로그아웃 실패' });
+        }
+        res.clearCookie('connect.sid'); // 세션 쿠키 제거
+        res.status(200).json({ message: '로그아웃 완료' });
     })
 })
 
